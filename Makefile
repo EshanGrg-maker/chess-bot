@@ -1,4 +1,4 @@
-LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
+LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image
 INCLUDE = -I src/include -I Stuff
 
 # Recursive wildcard function

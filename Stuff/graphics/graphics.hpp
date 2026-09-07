@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <string>
 
 class program_graphics
 {
@@ -12,6 +13,7 @@ class program_graphics
     private:
         void draw_board();
         void check_events();
+        void draw_image(std::string img_path,int x,int y,int w,int h);
 
         const int WINDOW_SIZE = 600;
         int square_size;
