@@ -5,6 +5,7 @@
 #include <SDL2/SDL_image.h>
 #include <string>
 
+#include "../Engine/ChessEngine.hpp"
 #include "graphics.hpp"
 
 using namespace std;

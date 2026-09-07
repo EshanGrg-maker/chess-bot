@@ -2,8 +2,8 @@
 #include <SDL2/SDL.h>
 #include <math.h>
 
-#include "Stuff/graphics/graphics.hpp"
 #include "Stuff/Engine/ChessEngine.hpp"
+#include "Stuff/graphics/graphics.hpp"
 
 using namespace std;
 

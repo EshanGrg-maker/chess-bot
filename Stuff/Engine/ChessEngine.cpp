@@ -42,3 +42,7 @@ void Chess::check_events()
             break;
     }
 }
+void Chess::update()
+{
+    check_events();
+}

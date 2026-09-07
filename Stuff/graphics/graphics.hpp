@@ -4,7 +4,6 @@
 #include <string>
 #include <map>
 
-#include "../Engine/ChessEngine.hpp"
 
 class program_graphics
 {
