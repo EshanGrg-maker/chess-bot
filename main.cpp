@@ -14,8 +14,8 @@ int main(int argc, char * argv[])
     graphics->init(chess_engine);
 
     while (chess_engine->is_running()) {
-        chess_engine->update();
         graphics->update();
+        chess_engine->update();
     }
 
     graphics->clean();

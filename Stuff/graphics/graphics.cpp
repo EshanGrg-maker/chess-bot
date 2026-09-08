@@ -48,6 +48,8 @@ void program_graphics::draw_board()
 {
     SDL_Rect square_rect;
     square_rect.w = square_size; square_rect.h = square_size;
+    
+    square selected_square = chess_engine->GetSelectedSquare();
     for (int y = 0; y <= 8; y++)
     {
         for (int x = 0; x <= 8; x++)
@@ -63,12 +65,39 @@ void program_graphics::draw_board()
         Piece* piece = chess.board[i];
         if (piece != nullptr)
         {
-            int y = std::floor(i / 8);
-            int x = i;
-            if (i >= 8) {x = i - (y*8);}
-            draw_piece(piece->clr_index,piece->piece_index,x,y);
+            square sqr = piece->get_square();
+            draw_piece(piece->clr_index,piece->piece_index,sqr.x,sqr.y);
         }
     }
+
+    for (square highlight : chess_engine->get_highlight_squares())
+    {
+        square_rect.x = highlight.x * square_size; square_rect.y = highlight.y * square_size;
+        SDL_SetRenderDrawColor(renderer,255,0,0,100);
+        SDL_RenderDrawRect(renderer,&square_rect);
+        SDL_RenderFillRect(renderer,&square_rect);
+    }
+
+    if (selected_square.x != -1)
+    {
+        square_rect.x = selected_square.x * square_size; square_rect.y = selected_square.y * square_size;
+        SDL_SetRenderDrawColor(renderer,255,255,0,50);
+        SDL_RenderDrawRect(renderer,&square_rect);
+        SDL_RenderFillRect(renderer,&square_rect);
+
+        Piece* selected_piece = chess_engine->board[(selected_square.y*8) + selected_square.x];
+        SDL_SetRenderDrawColor(renderer,0,0,0,255);
+        int square_div = 8;
+        square_rect.w /= square_div; square_rect.h /= square_div;
+        for (square legal_move : selected_piece->get_legal_moves())
+        {
+            square_rect.x = ((legal_move.x * square_size) + (square_size / 2)) - (square_rect.w / 2); square_rect.y = ((legal_move.y * square_size) + (square_size / 2)) - (square_rect.h / 2);
+            SDL_RenderDrawRect(renderer,&square_rect);
+            SDL_RenderFillRect(renderer,&square_rect);
+        }
+    }
+
+    SDL_SetRenderDrawColor(renderer,255,255,255,255);
 }
 SDL_Texture* program_graphics::file_to_texture(std::string path)
 {
