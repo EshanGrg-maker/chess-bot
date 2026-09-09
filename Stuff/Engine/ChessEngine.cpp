@@ -116,21 +116,44 @@ void Piece::calculate_legal_moves()
     legal_moves.clear();
     switch (piece_index)
     {
-        case 5:
+        case 3: // knight
+            for (int y = -2; y <= 2; y += 4)
+            {
+                for (int x = -1; x <= 1; x += 2)
+                {
+                    square sqr = square(current_square.x + x,current_square.y + y);
+                    if (sqr.x < 0 || sqr.x > 8 || sqr.y < 0 || sqr.y > 8) {continue;}
+                    int index = (sqr.y*8)+sqr.x;
+                    if (board[index] == nullptr || board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
+                }
+            } 
+            for (int x = -2; x <= 2; x += 4)
+            {
+                for (int y = -1; y <= 1; y += 2)
+                {
+                    square sqr = square(current_square.x + x,current_square.y + y);
+                    if (sqr.x < 0 || sqr.x > 8 || sqr.y < 0 || sqr.y > 8) {continue;}
+                    int index = (sqr.y*8)+sqr.x;
+                    if (board[index] == nullptr || board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
+                }                
+            } 
+            break;
+        case 5: // pawn
             int delta_y = -1;
             int limit = delta_y;
+            if (current_square.y <= 0 || current_square.y >= 8) {return;}
             if (last_square.x == -1) {limit *= 2;}
             for (int y = delta_y; y >= limit; y += delta_y) 
             {
                 square sqr = square(current_square.x,current_square.y + y);
-                if (board[(sqr.y*8)+sqr.x] == nullptr) {legal_moves.push_back(sqr);} 
+                if (board[(sqr.y*8)+sqr.x] == nullptr) {legal_moves.push_back(sqr);} else {break;}
             }
             for (int x = -1; x <= 1; x++)
-            {\
+            {
                 if (x==0) {continue;}
                 square sqr = square(current_square.x + x,current_square.y + delta_y);
                 int index = (sqr.y*8)+sqr.x;
-                if (board[index] != nullptr && board[index]->piece_index != piece_index) {legal_moves.push_back(sqr);} 
+                if (board[index] != nullptr && board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
             }
 
             break;
