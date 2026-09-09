@@ -14,25 +14,25 @@ Chess::Chess()
 void Chess::reset_board()
 {
     for (int i = 0; i < 64; i++) {board[i] = nullptr;}
-    board[0] = new Piece(2,1,0);
-    board[1] = new Piece(3,1,1);
-    board[2] = new Piece(4,1,2);
-    board[3] = new Piece(1,1,3);
-    board[4] = new Piece(0,1,4);
-    board[5] = new Piece(4,1,5);
-    board[6] = new Piece(3,1,6);
-    board[7] = new Piece(2,1,7);
-    for (int i = 8; i <= 15; i++) {board[i] = new Piece(5,1,i);}
+    board[0] = new Piece(2,1,0,board);
+    board[1] = new Piece(3,1,1,board);
+    board[2] = new Piece(4,1,2,board);
+    board[3] = new Piece(1,1,3,board);
+    board[4] = new Piece(0,1,4,board);
+    board[5] = new Piece(4,1,5,board);
+    board[6] = new Piece(3,1,6,board);
+    board[7] = new Piece(2,1,7,board);
+    for (int i = 8; i <= 15; i++) {board[i] = new Piece(5,1,i,board);}
 
-    board[56] = new Piece(2,0,56);
-    board[57] = new Piece(3,0,57);
-    board[58] = new Piece(4,0,58);
-    board[59] = new Piece(1,0,59);
-    board[60] = new Piece(0,0,60);
-    board[61] = new Piece(4,0,61);
-    board[62] = new Piece(3,0,62);
-    board[63] = new Piece(2,0,63); 
-    for (int i = 48; i <= 55; i++) {board[i] = new Piece(5,0,i);}
+    board[56] = new Piece(2,0,56,board);
+    board[57] = new Piece(3,0,57,board);
+    board[58] = new Piece(4,0,58,board);
+    board[59] = new Piece(1,0,59,board);
+    board[60] = new Piece(0,0,60,board);
+    board[61] = new Piece(4,0,61,board);
+    board[62] = new Piece(3,0,62,board);
+    board[63] = new Piece(2,0,63,board); 
+    for (int i = 48; i <= 55; i++) {board[i] = new Piece(5,0,i,board);}
 };
 
 void Chess::check_events()
@@ -46,6 +46,21 @@ void Chess::check_events()
             break;
         case SDL_MOUSEBUTTONDOWN:
             handle_mouse_input(event.button);
+        case SDL_KEYDOWN:
+            if (event.key.keysym.scancode == SDL_SCANCODE_P)
+            {
+                std::string out;
+                for (int y = 0; y < 8; y++)
+                {
+                    for (int x = 0; x < 8; x++)
+                    {
+                        int index = (y*8) + x;
+                        if (board[index] != nullptr) {out += "O,";} else {out += "_,";}
+                    }
+                    out += "\n";
+                }
+                std::cout << out << std::endl;
+            }
     }
 }
 void Chess::handle_mouse_input(SDL_MouseButtonEvent& event)
@@ -62,6 +77,9 @@ void Chess::handle_mouse_input(SDL_MouseButtonEvent& event)
             selected_square.y = std::floor(mouse_y /(600/8));
 
             board[tile_index]->calculate_legal_moves();
+        } else if (selected_square.x != -1)
+        {
+            if (board[(selected_square.y*8)+selected_square.x]->Move(tile_index)) {selected_square = square();}
         }
 
     }
@@ -107,22 +125,23 @@ void Piece::calculate_legal_moves()
     }
 };
 
-void Piece::Move()
+bool Piece::Move(int board_index)
 {
-    std::vector<square> legal_moves;
-    switch (piece_index)
-    {
-        case 0:
-            for (int x = -1; x <= 1; x++)
-            {
-                for (int y = -1; y <= 1; y++)
-                {
-                    if (x == 0 && y == 0) {continue;}
-                    legal_moves.push_back(square(x,y));
-                }
-            }
-            break;
-        
-    }
+    int move_index = -1; int i = 0;
+    for (square legal_move : legal_moves) {if (((legal_move.y*8)+legal_move.x) == board_index) {move_index = i; break;} i++;}
 
+    if (move_index == -1) { return false; }
+
+    last_square.x = current_square.x; last_square.y = current_square.y;
+    current_square.x = legal_moves[move_index].x; current_square.y = legal_moves[move_index].y;
+    
+    last_board_index = current_board_index;
+    current_board_index = board_index;
+
+    board[current_board_index] = board[last_board_index];
+    board[last_board_index] = nullptr;
+
+    legal_moves.clear();
+
+    return true;
 }

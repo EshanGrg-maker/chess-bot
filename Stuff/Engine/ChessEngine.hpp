@@ -1,16 +1,20 @@
 #include <iostream>
+#include <string>
 #include <vector>
 
 struct square
 {
     square(int X = -1, int Y = -1) {x = X; y = Y;}
+    std::string row_letters[8] = {"a","b","c","d","e","f","g","h"};
+    void print_pos() {std::cout << row_letters[x] << 8 - y << std::endl;}
+
     int x = -1; int y = -1;
 };
 
 class Piece
 {
     public:
-        Piece(int piece_i,int clr_i, int board_index) 
+        Piece(int piece_i,int clr_i, int board_index,Piece** board_arr) 
         {
             piece_index = piece_i; 
             clr_index = clr_i; 
@@ -18,9 +22,11 @@ class Piece
             int x = board_index;
             if (board_index >= 8) {x = board_index - (current_square.y*8);}
             current_square.x = x;
+            current_board_index = board_index;
+            board = board_arr;
         }
         void calculate_legal_moves();
-        void Move();
+        bool Move(int board_index);
 
         std::vector<square> get_legal_moves() {return legal_moves;}
         square get_square() {return current_square;}
@@ -28,10 +34,11 @@ class Piece
         int piece_index = -1;
         int clr_index = -1;
     private:
-        square current_square;
-        square last_square;
+        square current_square; int current_board_index = -1;
+        square last_square; int last_board_index = -1;
 
         std::vector<square> legal_moves;
+        Piece** board;
 };
 
 class Chess

@@ -15,7 +15,6 @@ class program_graphics
         void update();
         void clean();
     private:
-        Chess chess;
         void draw_board();
         void draw_piece(int clr_index,int piece_index,int x,int y);
         SDL_Texture* file_to_texture(std::string path);

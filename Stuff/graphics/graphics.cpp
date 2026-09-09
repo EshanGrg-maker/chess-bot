@@ -62,7 +62,7 @@ void program_graphics::draw_board()
     }
     for (int i = 0; i < 64; i++)
     {
-        Piece* piece = chess.board[i];
+        Piece* piece = chess_engine->board[i];
         if (piece != nullptr)
         {
             square sqr = piece->get_square();
