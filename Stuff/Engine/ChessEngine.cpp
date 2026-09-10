@@ -110,33 +110,100 @@ void Chess::update()
     check_events();
 }
 
+void calculate_bishop_moves(square current_square,int clr_index,Piece** board,std::vector<square>* legal_moves)
+{
+    for (int delta_x = -1; delta_x <= 1; delta_x += 2)
+    {
+        for (int delta_y = -1; delta_y <= 1; delta_y += 2)
+        {
+            for (int mult = 1; mult <= 8; mult++)
+            {
+                int x = delta_x * mult; int y = delta_y * mult;
 
+                square sqr = square(current_square.x + x,current_square.y + y);
+                if (sqr.y < 0 || sqr.y >= 8 || sqr.x < 0 || sqr.x >= 8) {break;}
+                int index = (sqr.y*8) + sqr.x;
+                if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves->push_back(sqr);  break;}} 
+                else {legal_moves->push_back(sqr);}
+            }
+        }
+    }
+}
+void calculate_rook_moves(square current_square,int clr_index,Piece** board,std::vector<square>* legal_moves)
+{
+    for (int delta_x = - 1; delta_x <= 1; delta_x+=2)
+    {
+        for (int mult = 1; mult <= 8; mult++)
+        {
+            square sqr = square(current_square.x + (delta_x*mult),current_square.y);
+            if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {break;}
+            int index = (sqr.y*8) + sqr.x;
+            if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves->push_back(sqr);  break;}} 
+            else {legal_moves->push_back(sqr);}
+        }
+    }
+    for (int delta_y = - 1; delta_y <= 1; delta_y+=2)
+    {
+        for (int mult = 1; mult <= 8; mult++)
+        {
+            square sqr = square(current_square.x,current_square.y + (delta_y*mult));
+            if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {break;}
+            int index = (sqr.y*8) + sqr.x;
+            if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves->push_back(sqr);  break;}} 
+            else {legal_moves->push_back(sqr);}
+        }
+    }
+}
 void Piece::calculate_legal_moves()
 {
     legal_moves.clear();
     switch (piece_index)
     {
-        case 3: // knight
+        case 0: //king
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (x == 0 && y == 0) {continue;}
+                    square sqr = square(current_square.x + x,current_square.y + y);
+                    if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {break;}
+                    int index = (sqr.y*8) + sqr.x;
+                    if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves.push_back(sqr);  break;}} 
+                    else {legal_moves.push_back(sqr);}    
+                }
+            }
+            break;
+        case 1: // queen
+            calculate_rook_moves(current_square,clr_index,board,&legal_moves);
+            calculate_bishop_moves(current_square,clr_index,board,&legal_moves);
+            break;
+        case 2: // rook
+            calculate_rook_moves(current_square,clr_index,board,&legal_moves);
+            break;
+        case 3: // knight 
             for (int y = -2; y <= 2; y += 4)
             {
                 for (int x = -1; x <= 1; x += 2)
                 {
                     square sqr = square(current_square.x + x,current_square.y + y);
-                    if (sqr.x < 0 || sqr.x > 8 || sqr.y < 0 || sqr.y > 8) {continue;}
+                    if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {continue;}
                     int index = (sqr.y*8)+sqr.x;
                     if (board[index] == nullptr || board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
                 }
-            } 
+            }  
             for (int x = -2; x <= 2; x += 4)
             {
                 for (int y = -1; y <= 1; y += 2)
                 {
                     square sqr = square(current_square.x + x,current_square.y + y);
-                    if (sqr.x < 0 || sqr.x > 8 || sqr.y < 0 || sqr.y > 8) {continue;}
+                    if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {continue;}
                     int index = (sqr.y*8)+sqr.x;
                     if (board[index] == nullptr || board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
                 }                
             } 
+            break;
+        case 4: // bishop
+            calculate_bishop_moves(current_square,clr_index,board,&legal_moves);
             break;
         case 5: // pawn
             int delta_y = -1;
