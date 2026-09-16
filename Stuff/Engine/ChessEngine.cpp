@@ -170,6 +170,21 @@ void Piece::calculate_legal_moves()
                     int index = (sqr.y*8) + sqr.x;
                     if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves.push_back(sqr);  break;}} 
                     else {legal_moves.push_back(sqr);}    
+
+                    if (last_square.x == -1) // castling  
+                    {
+                        square sqr_castle;
+                        if (board[63] != nullptr && board[63]->get_last_square().x == -1) // kingside permitted
+                        {
+                            sqr_castle = board[63]->get_square();
+                            sqr_castle.x -= 1;
+                        }
+                        if (board[56] != nullptr && board[56]->get_last_square().x == -1) // queenside permitted
+                        {
+                            sqr_castle = board[63]->get_square();
+                            sqr_castle.x += 1; 
+                        }
+                    }
                 }
             }
             break;

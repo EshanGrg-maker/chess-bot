@@ -30,6 +30,7 @@ class Piece
 
         std::vector<square> get_legal_moves() {return legal_moves;}
         square get_square() {return current_square;}
+        square get_last_square() {return last_square;}
 
         int piece_index = -1;
         int clr_index = -1;
