@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "../ChessMath/ChessMath.hpp"
+
 struct square
 {
     square(int X = -1, int Y = -1) {x = X; y = Y;}
@@ -18,15 +20,13 @@ class Piece
         {
             piece_index = piece_i; 
             clr_index = clr_i; 
-            current_square.y = std::floor(board_index / 8);
-            int x = board_index;
-            if (board_index >= 8) {x = board_index - (current_square.y*8);}
-            current_square.x = x;
+            index_to_coord(board_index,current_square.x,current_square.y);
             current_board_index = board_index;
             board = board_arr;
         }
         void calculate_legal_moves();
         bool Move(int board_index);
+        void force_move(int board_index);
 
         std::vector<square> get_legal_moves() {return legal_moves;}
         square get_square() {return current_square;}

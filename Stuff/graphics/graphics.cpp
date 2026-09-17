@@ -85,7 +85,7 @@ void program_graphics::draw_board()
         SDL_RenderDrawRect(renderer,&square_rect);
         SDL_RenderFillRect(renderer,&square_rect);
 
-        Piece* selected_piece = chess_engine->board[(selected_square.y*8) + selected_square.x];
+        Piece* selected_piece = chess_engine->board[coord_to_index(selected_square.x, selected_square.y)];
         SDL_SetRenderDrawColor(renderer,0,255,0,255);
         int square_div = 8;
         square_rect.w /= square_div; square_rect.h /= square_div;

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ChessEngine.hpp"
+#include "../ChessMath/ChessMath.hpp"
 
 Chess::~Chess() {};
 Chess::Chess() 
@@ -54,7 +55,7 @@ void Chess::check_events()
                 {
                     for (int x = 0; x < 8; x++)
                     {
-                        int index = (y*8) + x;
+                        int index = coord_to_index(x, y);
                         if (board[index] != nullptr) {out += "O,";} else {out += "_,";}
                     }
                     out += "\n";
@@ -70,7 +71,7 @@ void Chess::handle_mouse_input(SDL_MouseButtonEvent& event)
         int mouse_x; int mouse_y;
         Uint32 buttons = SDL_GetMouseState(&mouse_x,&mouse_y);
 
-        int tile_index = (std::floor(mouse_y /(600/8))*8) + std::floor(mouse_x / (600/8));
+        int tile_index = coord_to_index(std::floor(mouse_x / (600/8)), std::floor(mouse_y /(600/8)));
         if (board[tile_index] != nullptr && board[tile_index]->clr_index == player_colour) 
         {
             selected_square.x = std::floor(mouse_x / (600/8));
@@ -79,7 +80,7 @@ void Chess::handle_mouse_input(SDL_MouseButtonEvent& event)
             board[tile_index]->calculate_legal_moves();
         } else if (selected_square.x != -1)
         {
-            if (board[(selected_square.y*8)+selected_square.x]->Move(tile_index)) {selected_square = square();}
+            if (board[coord_to_index(selected_square.x, selected_square.y)]->Move(tile_index)) {selected_square = square();}
         }
 
     }
@@ -122,7 +123,7 @@ void calculate_bishop_moves(square current_square,int clr_index,Piece** board,st
 
                 square sqr = square(current_square.x + x,current_square.y + y);
                 if (sqr.y < 0 || sqr.y >= 8 || sqr.x < 0 || sqr.x >= 8) {break;}
-                int index = (sqr.y*8) + sqr.x;
+                int index = coord_to_index(sqr.x, sqr.y);
                 if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves->push_back(sqr);  break;}} 
                 else {legal_moves->push_back(sqr);}
             }
@@ -137,7 +138,7 @@ void calculate_rook_moves(square current_square,int clr_index,Piece** board,std:
         {
             square sqr = square(current_square.x + (delta_x*mult),current_square.y);
             if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {break;}
-            int index = (sqr.y*8) + sqr.x;
+            int index = coord_to_index(sqr.x, sqr.y);
             if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves->push_back(sqr);  break;}} 
             else {legal_moves->push_back(sqr);}
         }
@@ -148,7 +149,7 @@ void calculate_rook_moves(square current_square,int clr_index,Piece** board,std:
         {
             square sqr = square(current_square.x,current_square.y + (delta_y*mult));
             if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {break;}
-            int index = (sqr.y*8) + sqr.x;
+            int index = coord_to_index(sqr.x, sqr.y);
             if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves->push_back(sqr);  break;}} 
             else {legal_moves->push_back(sqr);}
         }
@@ -167,22 +168,23 @@ void Piece::calculate_legal_moves()
                     if (x == 0 && y == 0) {continue;}
                     square sqr = square(current_square.x + x,current_square.y + y);
                     if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {break;}
-                    int index = (sqr.y*8) + sqr.x;
+                    int index = coord_to_index(sqr.x, sqr.y);
                     if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_moves.push_back(sqr);  break;}} 
                     else {legal_moves.push_back(sqr);}    
 
                     if (last_square.x == -1) // castling  
                     {
                         square sqr_castle;
+                        sqr_castle.y = current_square.y;
                         if (board[63] != nullptr && board[63]->get_last_square().x == -1) // kingside permitted
                         {
-                            sqr_castle = board[63]->get_square();
-                            sqr_castle.x -= 1;
+                            sqr_castle.x = current_square.x + 2;
+                            legal_moves.push_back(sqr_castle);
                         }
                         if (board[56] != nullptr && board[56]->get_last_square().x == -1) // queenside permitted
                         {
-                            sqr_castle = board[63]->get_square();
-                            sqr_castle.x += 1; 
+                            sqr_castle.x = current_square.x - 2;
+                            legal_moves.push_back(sqr_castle);
                         }
                     }
                 }
@@ -202,7 +204,7 @@ void Piece::calculate_legal_moves()
                 {
                     square sqr = square(current_square.x + x,current_square.y + y);
                     if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {continue;}
-                    int index = (sqr.y*8)+sqr.x;
+                    int index = coord_to_index(sqr.x, sqr.y);
                     if (board[index] == nullptr || board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
                 }
             }  
@@ -212,7 +214,7 @@ void Piece::calculate_legal_moves()
                 {
                     square sqr = square(current_square.x + x,current_square.y + y);
                     if (sqr.x < 0 || sqr.x >= 8 || sqr.y < 0 || sqr.y >= 8) {continue;}
-                    int index = (sqr.y*8)+sqr.x;
+                    int index = coord_to_index(sqr.x, sqr.y);
                     if (board[index] == nullptr || board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
                 }                
             } 
@@ -228,13 +230,13 @@ void Piece::calculate_legal_moves()
             for (int y = delta_y; y >= limit; y += delta_y) 
             {
                 square sqr = square(current_square.x,current_square.y + y);
-                if (board[(sqr.y*8)+sqr.x] == nullptr) {legal_moves.push_back(sqr);} else {break;}
+                if (board[coord_to_index(sqr.x, sqr.y)] == nullptr) {legal_moves.push_back(sqr);} else {break;}
             }
             for (int x = -1; x <= 1; x++)
             {
                 if (x==0) {continue;}
                 square sqr = square(current_square.x + x,current_square.y + delta_y);
-                int index = (sqr.y*8)+sqr.x;
+                int index = coord_to_index(sqr.x, sqr.y);
                 if (board[index] != nullptr && board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
             }
 
@@ -242,15 +244,10 @@ void Piece::calculate_legal_moves()
     }
 };
 
-bool Piece::Move(int board_index)
+void Piece::force_move(int board_index)
 {
-    int move_index = -1; int i = 0;
-    for (square legal_move : legal_moves) {if (((legal_move.y*8)+legal_move.x) == board_index) {move_index = i; break;} i++;}
-
-    if (move_index == -1) { return false; }
-
-    last_square.x = current_square.x; last_square.y = current_square.y;
-    current_square.x = legal_moves[move_index].x; current_square.y = legal_moves[move_index].y;
+    last_square = current_square;
+    index_to_coord(board_index,current_square.x,current_square.y);
     
     last_board_index = current_board_index;
     current_board_index = board_index;
@@ -259,6 +256,39 @@ bool Piece::Move(int board_index)
     board[last_board_index] = nullptr;
 
     legal_moves.clear();
+}
+bool Piece::Move(int board_index)
+{
+    int move_index = -1; int i = 0;
+    square move_sqr;
+    for (square legal_move : legal_moves) 
+    {
+        if (coord_to_index(legal_move.x, legal_move.y) == board_index) {move_index = i; move_sqr = legal_move; break;} 
+        i++;
+    }
+
+    if (move_index == -1) { return false; }
+
+    // special stuff
+    int move_offset = current_square.x - move_sqr.x;
+    if (piece_index == 0 && abs(move_offset) == 2 ) // castling
+    {
+        square rk_sqr; rk_sqr.y = move_sqr.y;
+        int rk_index;
+        if (move_offset > 0) // queenside
+        {
+            rk_sqr.x = move_sqr.x + 1;
+            rk_index = 56;
+        }
+        else // kingside 
+        {
+            rk_sqr.x = move_sqr.x - 1;
+            rk_index = 63;
+        }
+        board[rk_index]->force_move(coord_to_index(rk_sqr.x,rk_sqr.y));
+    }
+    // moving the piece
+    force_move(board_index);
 
     return true;
 }
