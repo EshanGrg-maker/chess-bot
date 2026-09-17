@@ -80,7 +80,11 @@ void Chess::handle_mouse_input(SDL_MouseButtonEvent& event)
             board[tile_index]->calculate_legal_moves();
         } else if (selected_square.x != -1)
         {
-            if (board[coord_to_index(selected_square.x, selected_square.y)]->Move(tile_index)) {selected_square = square();}
+            if (board[coord_to_index(selected_square.x, selected_square.y)]->Move(tile_index)) 
+            {
+                selected_square = square();
+                complete_turn();
+            }
         }
 
     }
@@ -109,6 +113,13 @@ void Chess::handle_mouse_input(SDL_MouseButtonEvent& event)
 void Chess::update()
 {
     check_events();
+
+    if (turn_complete == true)
+    {
+        turn_complete = false;
+        player_colour = !player_colour;
+    }
+
 }
 
 void calculate_bishop_moves(square current_square,int clr_index,Piece** board,std::vector<square>* legal_moves)
@@ -223,11 +234,13 @@ void Piece::calculate_legal_moves()
             calculate_bishop_moves(current_square,clr_index,board,&legal_moves);
             break;
         case 5: // pawn
-            int delta_y = -1;
-            int limit = delta_y;
             if (current_square.y <= 0 || current_square.y >= 8) {return;}
+
+            int delta_y = 1; 
+            int limit = delta_y;
+            if (clr_index == 0) {delta_y = -1;} else if (clr_index == 1) {delta_y = 1;}
             if (last_square.x == -1) {limit *= 2;}
-            for (int y = delta_y; y >= limit; y += delta_y) 
+            for (int y = delta_y; abs(y) <= limit; y += delta_y) 
             {
                 square sqr = square(current_square.x,current_square.y + y);
                 if (board[coord_to_index(sqr.x, sqr.y)] == nullptr) {legal_moves.push_back(sqr);} else {break;}

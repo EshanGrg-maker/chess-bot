@@ -54,6 +54,7 @@ class Chess
         bool is_running() {return running;}
         square GetSelectedSquare() {return selected_square;}
         std::vector<square> get_highlight_squares() {return highlight_squares;}
+        void complete_turn() {turn_complete = true;}
     private:
         void check_events();
         void handle_mouse_input(SDL_MouseButtonEvent& event);
@@ -64,5 +65,6 @@ class Chess
         std::vector<square> highlight_squares;
 
         int player_colour = 0;
+        bool turn_complete = false;
         bool running = true;
 };
