@@ -32,6 +32,8 @@ class Piece
         square get_square() {return current_square;}
         square get_last_square() {return last_square;}
 
+        bool last_moved = false;
+
         int piece_index = -1;
         int clr_index = -1;
     private:
@@ -50,11 +52,12 @@ class Chess
         ~Chess();
 
         void update();
+        void complete_turn() {turn_complete = true;}
 
         bool is_running() {return running;}
         square GetSelectedSquare() {return selected_square;}
         std::vector<square> get_highlight_squares() {return highlight_squares;}
-        void complete_turn() {turn_complete = true;}
+        Piece* get_last_moved_piece() {return last_moved_piece;}
     private:
         void check_events();
         void handle_mouse_input(SDL_MouseButtonEvent& event);
@@ -63,6 +66,8 @@ class Chess
 
         square selected_square;
         std::vector<square> highlight_squares;
+
+        Piece* last_moved_piece = nullptr;
 
         int player_colour = 0;
         bool turn_complete = false;

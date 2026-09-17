@@ -80,8 +80,12 @@ void Chess::handle_mouse_input(SDL_MouseButtonEvent& event)
             board[tile_index]->calculate_legal_moves();
         } else if (selected_square.x != -1)
         {
-            if (board[coord_to_index(selected_square.x, selected_square.y)]->Move(tile_index)) 
+            Piece* selected_piece = board[coord_to_index(selected_square.x, selected_square.y)];
+            if (selected_piece->Move(tile_index)) 
             {
+                if (last_moved_piece != nullptr) {last_moved_piece->last_moved = false;}
+                last_moved_piece = selected_piece;
+                last_moved_piece->last_moved = true;
                 selected_square = square();
                 complete_turn();
             }
@@ -240,18 +244,33 @@ void Piece::calculate_legal_moves()
             int limit = delta_y;
             if (clr_index == 0) {delta_y = -1;} else if (clr_index == 1) {delta_y = 1;}
             if (last_square.x == -1) {limit *= 2;}
-            for (int y = delta_y; abs(y) <= limit; y += delta_y) 
+            for (int y = delta_y; abs(y) <= limit; y += delta_y) // forwards movement 
             {
                 square sqr = square(current_square.x,current_square.y + y);
                 if (board[coord_to_index(sqr.x, sqr.y)] == nullptr) {legal_moves.push_back(sqr);} else {break;}
             }
-            for (int x = -1; x <= 1; x++)
+            for (int x = -1; x <= 1; x+=2) // diagonal taking + en passant
             {
-                if (x==0) {continue;}
+                // checking to see if anything can be taken diagonally
+                //if (x==0) {continue;}
                 square sqr = square(current_square.x + x,current_square.y + delta_y);
                 int index = coord_to_index(sqr.x, sqr.y);
                 if (board[index] != nullptr && board[index]->clr_index != clr_index) {legal_moves.push_back(sqr);} 
+
+                // checking for enpassant
+                index = coord_to_index(sqr.x,current_square.y);
+                if (board[index] != nullptr && board[index]->clr_index != clr_index && board[index]->piece_index == piece_index)
+                {
+                    // checking if pawn just moved two squares#
+                    square p_L_sqr = board[index]->get_last_square();
+                    if (p_L_sqr.x != -1 && abs(current_square.y - p_L_sqr.y) == 2) 
+                    {
+                        sqr.x = p_L_sqr.x;
+                        legal_moves.push_back(sqr);
+                    }
+                }
             }
+            
 
             break;
     }
@@ -299,6 +318,10 @@ bool Piece::Move(int board_index)
             rk_index = 63;
         }
         board[rk_index]->force_move(coord_to_index(rk_sqr.x,rk_sqr.y));
+    }
+    if (piece_index == 5 && board[board_index] == nullptr) // en passant
+    {
+        
     }
     // moving the piece
     force_move(board_index);
