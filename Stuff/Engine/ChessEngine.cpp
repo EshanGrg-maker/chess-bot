@@ -321,7 +321,11 @@ bool Piece::Move(int board_index)
     }
     if (piece_index == 5 && board[board_index] == nullptr) // en passant
     {
-        
+        if (move_sqr.x - current_square.x != 0 )
+        {
+            int delta_y; if (clr_index == 0) {delta_y = 1;} else if (clr_index == 1) {delta_y = -1;}
+            board[coord_to_index(move_sqr.x,move_sqr.y + delta_y)] = nullptr;
+        }
     }
     // moving the piece
     force_move(board_index);
