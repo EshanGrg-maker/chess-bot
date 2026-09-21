@@ -55,6 +55,8 @@ class Chess
         void complete_turn() {turn_complete = true;}
 
         bool is_running() {return running;}
+        bool is_checkmate() {return checkmate;}
+
         square GetSelectedSquare() {return selected_square;}
         std::vector<square> get_highlight_squares() {return highlight_squares;}
         Piece* get_last_moved_piece() {return last_moved_piece;}
@@ -63,6 +65,7 @@ class Chess
         void handle_mouse_input(SDL_MouseButtonEvent& event);
 
         void reset_board();
+        bool check_checkmate(int clr_i);
 
         square selected_square;
         std::vector<square> highlight_squares;
@@ -71,5 +74,7 @@ class Chess
 
         int player_colour = 0;
         bool turn_complete = false;
+        
+        bool checkmate = false;
         bool running = true;
 };

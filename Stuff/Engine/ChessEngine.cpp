@@ -332,3 +332,13 @@ bool Piece::Move(int board_index)
 
     return true;
 }
+
+bool Chess::check_checkmate(int clr_i)
+{
+    for (int i = 0; i <= 63; i++)
+    {
+        if (board[i] == nullptr || board[i]->clr_index != clr_i) {continue;}
+        else if (board[i]->get_legal_moves().size() != 0) {return false;}
+    }
+    return true;
+}
