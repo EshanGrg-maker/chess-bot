@@ -24,7 +24,7 @@ int program_graphics::init(Chess* ChessEngine)
 
         square_size = WINDOW_SIZE / 8;
 
-        string img_dir = "images/pieces/";
+        string img_dir = "assets/images/pieces/";
         white_imgs[0] = file_to_texture(img_dir + "White King.png");
         white_imgs[1] = file_to_texture(img_dir + "White Queen.png");
         white_imgs[2] = file_to_texture(img_dir + "White Rook.png");
@@ -38,6 +38,8 @@ int program_graphics::init(Chess* ChessEngine)
         black_imgs[3] = file_to_texture(img_dir + "Black Knight.png");
         black_imgs[4] = file_to_texture(img_dir + "Black Bishop.png");
         black_imgs[5] = file_to_texture(img_dir + "Black Pawn.png"); 
+
+        main_font = TTF_OpenFont("assets/fonts/COMIC.TTF",64);
 
         chess_engine = ChessEngine;
         return 1;
@@ -126,11 +128,39 @@ void program_graphics::draw_piece(int clr_index,int piece_index,int x,int y)
 
 }
 
+void program_graphics::draw_game_over()
+{
+    SDL_Rect rect;
+    rect.h = WINDOW_SIZE / 4;
+    rect.w = WINDOW_SIZE / 2;
+    rect.x = (WINDOW_SIZE / 2) - (rect.w / 2);
+    rect.y = (WINDOW_SIZE / 2) - (rect.h / 2);
+
+    SDL_SetRenderDrawColor(renderer,255,255,255,255);
+    SDL_RenderDrawRect(renderer,&rect);
+    SDL_RenderFillRect(renderer,&rect);
+
+    string winner; if (chess_engine->get_current_turn() == 0) {winner = "BLACK";} else {winner = "WHITE";}
+    string gameover_txt = "CHECKMATE! " + winner + " WINS";
+    SDL_Surface* sfrc = TTF_RenderText_Solid(main_font,gameover_txt.c_str(),SDL_Color{0,0,0});
+    SDL_Texture* txtr = SDL_CreateTextureFromSurface(renderer,sfrc);
+    SDL_FreeSurface(sfrc);
+
+ //   int w, h;
+        
+   //TTF_SizeText(main_font,gameover_txt.c_str(),&rect.w,&rect.h);
+   //TextureDimensions->x = w; TextureDimensions->y = h;
+
+    SDL_RenderCopy(renderer,txtr,NULL,&rect);
+}
+
 void program_graphics::update()
 {   
     SDL_RenderClear(renderer);
 
     draw_board();
+
+    if (chess_engine->is_checkmate() == true) { draw_game_over(); }
     SDL_RenderPresent(renderer);
 }
 

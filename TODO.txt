@@ -1,0 +1,2 @@
+Prevent casling through checks or pieces
+black king cant move

@@ -1,4 +1,9 @@
+#include <iostream>
 #include <math.h>
+
+#include <string.h>
+
+#include "../Piece/Piece.hpp"
 
 void index_to_coord(int index, int& Xptr, int& Yptr)
 {
