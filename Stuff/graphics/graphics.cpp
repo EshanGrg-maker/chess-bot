@@ -133,8 +133,7 @@ void program_graphics::draw_game_over()
     SDL_Rect rect;
     rect.h = WINDOW_SIZE / 4;
     rect.w = WINDOW_SIZE / 2;
-    rect.x = (WINDOW_SIZE / 2) - (rect.w / 2);
-    rect.y = (WINDOW_SIZE / 2) - (rect.h / 2);
+    center_rect(rect,WINDOW_SIZE/2,WINDOW_SIZE/2);
 
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
     SDL_RenderDrawRect(renderer,&rect);
@@ -144,14 +143,13 @@ void program_graphics::draw_game_over()
     string gameover_txt = "CHECKMATE! " + winner + " WINS";
     SDL_Surface* sfrc = TTF_RenderText_Solid(main_font,gameover_txt.c_str(),SDL_Color{0,0,0});
     SDL_Texture* txtr = SDL_CreateTextureFromSurface(renderer,sfrc);
+
+    TTF_SizeText(main_font,gameover_txt.c_str(),&rect.w,&rect.h);
+    center_rect(rect,WINDOW_SIZE/2,WINDOW_SIZE/2);
+
     SDL_FreeSurface(sfrc);
-
- //   int w, h;
-        
-   //TTF_SizeText(main_font,gameover_txt.c_str(),&rect.w,&rect.h);
-   //TextureDimensions->x = w; TextureDimensions->y = h;
-
     SDL_RenderCopy(renderer,txtr,NULL,&rect);
+    SDL_DestroyTexture(txtr);
 }
 
 void program_graphics::update()
