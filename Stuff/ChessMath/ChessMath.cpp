@@ -5,6 +5,7 @@
 #include <SDL2/SDL_rect.h>
 
 #include "../Piece/Piece.hpp"
+#include "../square.hpp"
 
 void index_to_coord(int index, int& Xptr, int& Yptr)
 {
@@ -21,4 +22,10 @@ void center_rect(SDL_Rect &rect, const int x, const int y)
     // positions the rect so that its center lies on {x,y}
     rect.x = x - (rect.w / 2);
     rect.y = y - (rect.y / 2);
+}
+
+bool square_in_vector(square sqr, vector<square> vect)
+{
+    for (square s : vect) {if (s.x == sqr.x && s.y == sqr.y) {return true;}}
+    return false;
 }

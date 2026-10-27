@@ -103,11 +103,11 @@ bool is_legal(int index_from, int index_to,Piece** board,int player_colour)
     {
         if (copy_board[i] != nullptr && copy_board[i]->clr_index != player_colour)
         {
-            std::cout << "ATTACK FROM: " << copy_board[i]->piece_index << " MOVING: " << board[index_from]->piece_index << std::endl;
+            //std::cout << "ATTACK FROM: " << copy_board[i]->piece_index << " MOVING: " << board[index_from]->piece_index << std::endl;
             for (square sqr : copy_board[i]->calculate_legal_moves(true,false))
             {
                 if (king_sqr.x == sqr.x && king_sqr.y == sqr.y)
-                {
+                { 
                     std::string out;
                     for (int j = 0; j <= 63; j++)
                     {
@@ -123,7 +123,7 @@ bool is_legal(int index_from, int index_to,Piece** board,int player_colour)
                             else {out += "_,";}
                         }
                     }
-                    std::cout << out << std::endl;
+                    //std::cout << out << std::endl;
                     return false; // moving this piece reveals a check on their king
                 }
             }
@@ -158,6 +158,8 @@ std::vector<square> Piece::calculate_legal_moves(bool return_val,bool x_ray)
                     if (board[index] != nullptr) {if (board[index]->clr_index == clr_index) {break;} else {legal_m.push_back(sqr);  break;}} 
                     else {legal_m.push_back(sqr);}    
                 }
+
+
             }
             break;
         case 1: // queen
@@ -228,6 +230,41 @@ std::vector<square> Piece::calculate_legal_moves(bool return_val,bool x_ray)
             
             break;
     }
+
+    if (piece_index == 0)
+    {
+        if (last_square.x == -1) // castling  
+        {
+            square sqr_castle;
+            sqr_castle.y = current_square.y;
+
+            int kingside_i; int queen_side_i;
+            if (clr_index == 0) {kingside_i = 63; queen_side_i = 56;}
+            else if (clr_index == 1) {kingside_i = 7; queen_side_i = 0;}
+
+            // starting to check if kingside castling is permitted
+            if (board[kingside_i] != nullptr && board[kingside_i]->get_last_square().x == -1) // is kingside rook free?
+            {
+                //std::cout << 1 << std::endl;
+                sqr_castle.x = current_square.x + 2;
+                
+                if (square_in_vector(square(sqr_castle.x - 1, sqr_castle.y),legal_moves) && (board[kingside_i-1] == nullptr && is_legal(current_board_index,kingside_i-1,board,clr_index)))
+                {
+                    std::cout << 2 << std::endl;
+                    legal_m.push_back(sqr_castle);
+                }
+            }
+            if (board[queen_side_i] != nullptr && board[queen_side_i]->get_last_square().x == -1) // queenside permitted
+            {
+                sqr_castle.x = current_square.x - 2;
+
+                if (square_in_vector(square(sqr_castle.x + 1,sqr_castle.y),legal_moves) && (board[queen_side_i+2] == nullptr && is_legal(current_board_index,queen_side_i+2,board,clr_index)))
+                {
+                    legal_m.push_back(sqr_castle);
+                }
+            }
+        }
+    }
     
     if (return_val == false) 
     {
@@ -235,41 +272,6 @@ std::vector<square> Piece::calculate_legal_moves(bool return_val,bool x_ray)
         for (square sqr : legal_m)
         {
             push_legal_move(sqr);
-        }
-        if (piece_index == 0)
-        {
-            if (last_square.x == -1) // castling  
-            {
-                square sqr_castle;
-                sqr_castle.y = current_square.y;
-
-                int kingside_i; int queen_side_i;
-                if (piece_index == 0) {kingside_i = 63; queen_side_i = 56;}
-                else if (piece_index == 1) {kingside_i = 7; queen_side_i = 0;}
-
-                // starting to check if kingside castling is permitted
-                if (board[kingside_i] != nullptr && board[kingside_i]->get_last_square().x == -1) // is kingside rook free?
-                {
-                    int squares_free = 0;
-                    sqr_castle.x = current_square.x + 2;
-                    for (square sqr : legal_moves)
-                    {
-                        if ((sqr.x == sqr_castle.x && sqr.y == sqr_castle.y) || (sqr.x == current_square.x + 1 && sqr.y == current_square.y))
-                        {
-                            squares_free++;
-                        }
-                    }
-                    if (squares_free == 2) 
-                    {
-                        legal_m.push_back(sqr_castle);
-                    }
-                }
-                if (board[kingside_i] != nullptr && board[kingside_i]->get_last_square().x == -1) // queenside permitted
-                {
-                    sqr_castle.x = current_square.x - 2;
-                    legal_m.push_back(sqr_castle);
-                }
-            }
         }
     }
     return legal_m;
